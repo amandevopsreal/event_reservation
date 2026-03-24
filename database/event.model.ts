@@ -109,8 +109,9 @@ const EventSchema = new Schema<IEvent>(
   }
 );
 
-// Pre-save hook for slug generation and data normalization
-EventSchema.pre('save', function (next) {
+// Pre-save hook for slug generation and data normalization.
+// Mongoose 9+ does not pass `next()`; sync hooks just run, errors propagate via throw.
+EventSchema.pre('save', function () {
   const event = this as IEvent;
 
   // Generate slug only if title changed or document is new
@@ -127,8 +128,6 @@ EventSchema.pre('save', function (next) {
   if (event.isModified('time')) {
     event.time = normalizeTime(event.time);
   }
-
-  next();
 });
 
 // Helper function to generate URL-friendly slug
